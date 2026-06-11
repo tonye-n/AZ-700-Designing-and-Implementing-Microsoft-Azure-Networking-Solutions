@@ -1,4 +1,3 @@
-
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
@@ -16,7 +15,7 @@
             "value": "testvm2-nic"
         },
         "vmSize": {
-            "value": "Standard_DS1_v2"
+            "value": "Standard_D2s_v3"
         },
         "adminUsername": {
             "value": "TestUser"

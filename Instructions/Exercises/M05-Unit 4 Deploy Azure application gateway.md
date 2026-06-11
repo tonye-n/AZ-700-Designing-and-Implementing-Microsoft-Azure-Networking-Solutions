@@ -1,38 +1,49 @@
 ---
 Exercise:
-    title: 'M05 - Unit 4 Deploy Azure Application Gateway'
-    module: 'Module 05 - Load balancing HTTP(S) traffic in Azure'
+  title: M05 - Unit 4 Deploy Azure Application Gateway
+  module: Module 05 - Load balancing HTTP(S) traffic in Azure
+  description: Create and configure an Azure Application Gateway.
+  duration: 25 minutes
+  level: 300
+  islab: true
+  primarytopics:
+    - Azure
+    - Azure Application Gateway
 ---
 
 # M05-Unit 4 Deploy Azure Application Gateway
- 
+
+## Exercise scenario
 
 In this exercise, you use the Azure portal to create an application gateway. Then you test it to make sure it works correctly.
-
->**Note**: An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Deploy%20Azure%20Application%20Gateway)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
-
-#### Estimated time: 25 minutes
 
 The application gateway directs application web traffic to specific resources in a backend pool. You assign listeners to ports, create rules, and add resources to a backend pool. For the sake of simplicity, this article uses a simple setup with a public front-end IP, a basic listener to host a single site on the application gateway, a basic request routing rule, and two virtual machines in the backend pool.
 
 For Azure to communicate between the resources that you create, it needs a virtual network. You can either create a new virtual network or use an existing one. In this example, you'll create a new virtual network while you create the application gateway. Application Gateway instances are created in separate subnets. You create two subnets in this example: one for the application gateway, and another for the backend servers.
 
-In this exercise, you will:
+
+![Diagram of application gateway architecture.](../media/4-exercise-deploy-azure-application-gateway.png)
+
+
+## Estimated time: 25 minutes
+
+## Job skills
+
+In this exercise, you:
 
 + Task 1: Create an application gateway
 + Task 2: Create virtual machines
 + Task 3: Add backend servers to backend pool
 + Task 4: Test the application gateway
 
-
 ## Task 1: Create an application gateway
 
 1. Sign in to the [Azure portal](https://portal.azure.com/) with your Azure account.
 
 1. On any Azure Portal page, in **Search resources, services and docs (G+/)**, enter application gateway, and then select **Application gateways** from the results.
-    ![Azure Portal search for application gateway](../media/search-application-gateway.png)    
+    ![Azure Portal search for application gateway](../media/search-application-gateway.png)
 
-1. On the Application gateways page, select **+ Create**.
+1. On the Application gateways page, select **+ Create**, and then select **Pplication Gateway**.
 
 1. On the Create application gateway **Basics** tab, enter, or select the following information:
 
@@ -54,11 +65,7 @@ In this exercise, you will:
    | **SUBNETS**       |                                    |
    | Subnet name       | Change **default** to **AGSubnet** |
    | Address range     | 10.0.0.0/24                        |
-   | Subnet name       | BackendSubnet                      |
-   | Address range     | 10.0.1.0/24                        |
 
-
->**Note**: If the UI does not have the option to add additional subnets, complete the steps and add the backend subnet after creating the gateway. 
 
 1. Select **OK** to return to the Create application gateway Basics tab.
 
@@ -89,17 +96,16 @@ In this exercise, you will:
 
 1. On the **Rule name** box, enter **RoutingRule**.
 
+1. For **Priority** enter **100**. 
+
 1. On the **Listener** tab, enter or select the following information:
 
     | **Setting**   | **Value**         |
     | ------------- | ----------------- |
     | Listener name | Listener          |
-    | Priority      | **100**           |
-    | Frontend IP   | Select **Public** |
+    | Frontend IP   | Select **Public IPv4** |
 
 1. Accept the default values for the other settings on the **Listener** tab.
-
-    ![Azure Portal add an Application Gateway routing rule](../media/Routing-rule-listener-tab.png)
 
 1. Select the **Backend targets** tab to configure the rest of the routing rule.
 
@@ -125,29 +131,63 @@ In this exercise, you will:
 
 1. Review the settings on the **Review + create** tab
 
-1. Select **Create** to create the virtual network, the public IP address, and the application gateway. 
+1. Select **Create** to create the virtual network, the public IP address, and the application gateway.
 
-It may take several minutes for Azure to create the application gateway. Wait until the deployment finishes successfully before moving on to the next section.
+1. It may take several minutes for Azure to create the application gateway. Wait until the deployment finishes successfully.
+
+### Add a subnet for a backend servers
+
+1. Search for and select the **ContosoVNet**. Verify the **AGSubnet** was created. 
+
+1. To create the **BackendSubnet**, select **Settings** and then **Subnets**. Be sure to **Add** the subnet when finished.
+   
+   | **Setting**       | **Value**                          |
+   | ----------------- | ---------------------------------- |
+   | Subnet name       | BackendSubnet                      |
+   | Address range     | 10.0.1.0/24                        |
 
 ## Task 2: Create virtual machines
 
-1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
+1. In the Azure portal, select the Cloud Shell icon (top right). If necessary, configure the shell.  
+    + Select **PowerShell**.
+    + Select **No Storage Account required** and your **Subscription**, then select **Apply**.
+    + Wait for the terminal to create and a prompt to be displayed.
+      
+1. On the toolbar of the Cloud Shell pane, select **Manage files** and then **Upload**. Upload the following files: **backend.json**, **backend.parameters.json**, and **install-iis.ps1**.
 
-1. On the toolbar of the Cloud Shell pane, select the **Upload/Download files** icon, in the drop-down menu, select **Upload** and upload the following files **backend.json** and **backend.parameters.json** into the Cloud Shell home directory one by one from the source folder **F:\Allfiles\Exercises\M05**.
+    >**Note:** If you are working in your own subscription the [template files](https://github.com/MicrosoftLearning/AZ-700-Designing-and-Implementing-Microsoft-Azure-Networking-Solutions/tree/master/Allfiles/Exercises) are available in the GitHub lab repository.
 
 1. Deploy the following ARM templates to create the VMs needed for this exercise:
 
->**Note**: You will be prompted to provide an Admin password.
+   >**Note**: You will be prompted to provide an Admin password. 
 
    ```powershell
    $RGName = "ContosoResourceGroup"
    
    New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile backend.json -TemplateParameterFile backend.parameters.json
    ```
-  
-1. When the deployment is complete, go to the Azure portal home page, and then select **Virtual Machines**.
+   >**Note**: Take time to review the **backend.json** file. There are two virtual machines being deployed. This will take a few minutes. 
 
-1. Verify that both virtual machines have been created.
+1. The command should complete successfully and list **BackendVM1** and **BackendVM2**.
+
+### Install IIS on each virtual machine
+
+1. Each backend server needs IIS installed.
+
+1. Continue at the PowerShell prompt and use the provided script to install IIS on **BackendVM1**.
+
+   ```powershell
+   Invoke-AzVMRunCommand -ResourceGroupName 'ContosoResourceGroup' -Name 'BackendVM1' -CommandId 'RunPowerShellScript' -ScriptPath 'install-iis.ps1'
+   ```
+
+   >**Note**: While you wait review the PowerShell script. Notice that the IIS home page is being customized to provide the virtual machine name.
+
+1. Run the command again, this time for **BackendVM2**.
+
+   ```powershell
+   Invoke-AzVMRunCommand -ResourceGroupName 'ContosoResourceGroup' -Name 'BackendVM2' -CommandId 'RunPowerShellScript' -ScriptPath 'install-iis.ps1'
+   ```
+   >**Note**: Each command will take a couple of minutes to complete.
 
 ## Task 3: Add backend servers to backend pool
 
@@ -159,25 +199,25 @@ It may take several minutes for Azure to create the application gateway. Wait un
 
 1. On the Edit backend pool page, under **Backend targets**, in **Target type**, select **Virtual machine**.
 
-1. Under **Target**, select **BackendVM1.** 
+1. Under **Target**, select **BackendVM1-nic.**
 
 1. On **Target type**, select **Virtual machine**.
 
-1. Under **Target**, select **BackendVM2.** 
+1. Under **Target**, select **BackendVM2-nic.**
 
-   ![Azure Portal add target backends to backend pool](../media/edit-backend-pool.png)
+1. Select **Save** and wait for the targets to be added. 
 
-1. Select **Save**.
+1. Check to ensure the backend servers are healthy. Select **Monitoring** and then **Backend Health**. Both targets should be healthy. 
 
-Wait for the deployment to complete before proceeding to the next step.
+   ![Azure Portal check backend health.](../media/contoso-backend-health.png)
 
 ## Task 4: Test the application gateway
 
 Although IIS isn't required to create the application gateway, you installed it in this exercise to verify if Azure successfully created the application gateway.
 
-### Use IIS to test the application gateway:
+### Use IIS to test the application gateway
 
-1. Find the public IP address for the application gateway on its **Overview** page. 
+1. Find the public IP address for the application gateway on its **Overview** page.
 
    ![Azure Portal look up Frontend Public IP address ](../media/app-gw-public-ip.png)
 
@@ -189,4 +229,36 @@ Although IIS isn't required to create the application gateway, you installed it 
 
 1. Refresh the browser multiple times and you should see connections to both BackendVM1 and BackendVM2.
 
-Congratulations! You have configured and tested an Azure Application Gateway.
+## Clean up resources
+
+   >**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.
+
+1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
+
+1. Delete all resource groups you created throughout the labs of this module by running the following command:
+
+   ```powershell
+   Remove-AzResourceGroup -Name 'IntLB-RG' -Force -AsJob
+   ```
+
+>**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+
+## Extend your learning with Copilot
+
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ How does the Azure Application Gateway route requests?
++ What security features does Azure Application Gateway include?
++ Compare the Azure Application Gateway with the Azure Load Balancer. Give examples of when to use each product.
+
+
+## Learn more with self-paced training
+
++ [Introduction to Azure Application Gateway](https://learn.microsoft.com/training/modules/intro-to-azure-application-gateway/). This module explains what Azure Application Gateway does, how it works, and when you should choose to use Application Gateway as a solution to meet your organization's needs.
++ [Load balance HTTP(S) traffic in Azure](https://learn.microsoft.com/training/modules/load-balancing-https-traffic-azure/). In this module, you learn how to design and implement Azure Application Gateway.
+
+## Key takeaways
+
+Congratulations on completing the lab. Here are the main takeaways for this lab. 
++ Azure Application Gateway is a web traffic (OSI layer 7) load balancer that enables you to manage traffic to your web applications.
++ Application Gateway can make routing decisions based on additional attributes of an HTTP request, for example URI path or host headers.
++ Use Application Gateway for application hosted in a single region and when you need URL based routing. 

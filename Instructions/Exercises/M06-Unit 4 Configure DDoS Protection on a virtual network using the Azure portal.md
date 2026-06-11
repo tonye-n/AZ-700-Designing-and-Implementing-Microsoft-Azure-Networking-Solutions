@@ -1,12 +1,28 @@
 ---
 Exercise:
-    title: 'M06 - Unit 4 Configure DDoS Protection on a virtual network using the Azure portal'
-    module: 'Module 06 - Design and implement network security'
+  title: M06 - Unit 4 Configure DDoS Protection on a virtual network using the Azure
+    portal
+  module: Module 06 - Design and implement network security
+  description: Configure DDoS Protection.
+  duration: 40 minutes
+  level: 400
+  islab: true
+  primarytopics:
+    - Azure
+    - DDoS Protection
 ---
 
 # M06-Unit 4 Configure DDoS Protection on a virtual network using the Azure portal
 
+## Exercise scenario
+
 Being responsible for Contoso's Network Security team, you are going to run a mock DDoS attack on the virtual network. The following steps walk you through creating a virtual network, configuring DDoS Protection, and creating an attack which you can observe and monitor with the help of telemetry and metrics.
+
+![Diagram of DDoS architecture.](../media/4-exercise-configure-ddos-protection-virtual-network-using-azure-portal.png)
+
+## Estimated time: 40 minutes
+
+## Job skills
 
 In this exercise, you will:
 
@@ -17,12 +33,8 @@ In this exercise, you will:
 + Task 5: Configure DDoS diagnostic logs
 + Task 6: Configure DDoS alerts
 + Task 7: Test with simulation partners
-+ Task 8: Clean up resources
+  
 
-**Note:** An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Configure%20Azure%20DDoS%20Protection%20on%20a%20virtual%20network)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
-
-
-#### Estimated time: 40 minutes
 
 ## Task 1: Create a resource group
 
@@ -30,7 +42,7 @@ In this exercise, you will:
 
 1. On the Azure portal home page, select **Resource groups**.
 
-1. Select **Create**. 
+1. Select **Create**.
 
 1. On the **Basics** tab, in **Resource group**, enter **MyResourceGroup**.
 
@@ -39,8 +51,6 @@ In this exercise, you will:
 1. Select **Review + create**.
 
 1. Select **Create**.
-
-
 
 ## Task 2: Create a DDoS Protection plan
 
@@ -54,8 +64,6 @@ In this exercise, you will:
 
 1. Select **Create**.
 
- 
-
 ## Task 3: Enable DDoS Protection on a new virtual network
 
 Here you will enable DDoS on a new virtual network rather than on an existing one, so first you need to create the new virtual network, then enable DDoS protection on it using the plan you created previously.
@@ -66,19 +74,15 @@ Here you will enable DDoS on a new virtual network rather than on an existing on
 
 1. On the **Basics** tab, select the resource group you created previously.
 
-1. On the **Name** box, enter **MyVirtualNetwork**, then select the **Security** tab. 
+1. On the **Name** box, enter **MyVirtualNetwork**, then select the **Security** tab.
 
 1. On the **Security** tab, next to **DDoS Network Protection**, select **Enable**.
 
 1. On the **DDoS protection plan** drop-down list, select **MyDdosProtectionPlan**.
 
-   ![Create virtual network - Security tab](../media/create-virtual-network-security-for-ddos-protection.png)
-
 1. Select **Review + create**.
 
 1. Select **Create**.
-
- 
 
 ## Task 4: Configure DDoS telemetry
 
@@ -96,14 +100,9 @@ You create a Public IP address, and then set up telemetry in the next steps.
 
 1. On **DNS name label**, enter **mypublicdnsxx** (where xx is your initials to make this unique).
 
-1. Select your resource group from the list.
-
-   ![Create public IP address](../media/create-public-ip-address-for-ddos-telemetry.png)
-
 1. Select **Create**.
 
-
-1. On the Azure home page, select **All resources**.
+1. To set up telemetry, navigate to the Azure home page, select **All resources**.
 
 1. On the list of your resources, select **MyDdosProtectionPlan**.
 
@@ -111,17 +110,11 @@ You create a Public IP address, and then set up telemetry in the next steps.
 
 1. Select the **Scope** box, then select the checkbox next to **MyPublicIPAddress**.
 
-    ![Create metrics scope for DDoS telemetry](../media/create-metrics-scope-for-ddos-telemetry.png)
-
 1. Select **Apply**.
 
 1. On the **Metrics** box, select **Inbound packets dropped DDoS**.
 
 1. On the **Aggregation** box, select **Max**.
-
-    ![Metrics created for DDoS telemetry](../media/metrics-created-for-ddos-telemetry.png)
-
- 
 
 ## Task 5: Configure DDoS diagnostic logs
 
@@ -131,9 +124,9 @@ You create a Public IP address, and then set up telemetry in the next steps.
 
 1. Under **Monitoring**, select **Diagnostic settings**.
 
-1. Select **Add diagnostic setting**. 
+1. Select **Add diagnostic setting**.
 
-1. On the **Diagnostic setting** page, in the **Diagnostic setting name** box, enter **MyDiagnosticSetting**. 
+1. On the **Diagnostic setting** page, in the **Diagnostic setting name** box, enter **MyDiagnosticSetting**.
 
 1. Under **Category details**, select all 3 **log** checkboxes and the **AllMetrics** checkbox.
 
@@ -144,8 +137,6 @@ You create a Public IP address, and then set up telemetry in the next steps.
 1. Normally you would now select **Save** to save your diagnostic settings. Note that this option is still grayed out as we cannot complete the setting configuration yet.
 
 1. Select **Discard**, then select **Yes**.
-
- 
 
 ## Task 6: Configure DDoS alerts
 
@@ -159,6 +150,8 @@ In this step you will create a virtual machine, assign a public IP address to it
 
 1. On the **Basics** tab, create a new VM using the information in the table below.
 
+    >**Note:** If the Ubuntu image and size isn't available in your region, select something else. The image and size isn't important to configuring the alert. 
+
    | **Setting**           | **Value**                                                    |
    | --------------------- | ------------------------------------------------------------ |
    | Subscription          | Select your subscription                                     |
@@ -166,15 +159,13 @@ In this step you will create a virtual machine, assign a public IP address to it
    | Virtual machine name  | **MyVirtualMachine**                                         |
    | Region                | Your region                                                  |
    | Availability options  | **No infrastructure  redundancy required**                   |
-   | Image                 | **Ubuntu Server 20.04 LTS -  Gen 2** (Select Configure VM Generation link if needed) |                     
-   | Size                  | Select **See  all sizes**, then choose **B1ls** in the  list and choose **Select**  **(Standard_B1ls - 1 vcpu,  0.5 GiB memory** |
+   | Image                 | **Ubuntu Server 22.04 LTS -  x64 Gen 2** (Select Configure VM Generation link if needed) |
+   | Size                  | Select **See  all sizes**, then choose **D-series v3** and then **Standard_D2s_v3** |
    | Authentication type   | **SSH public key**                                           |
    | Username              | **azureuser**                                                |
    | SSH public key source | **Generate new key pair**                                    |
    | Key pair name         | **myvirtualmachine-ssh-key**                                 |
    | Public inbound ports  | Select None                                                  |
-
-
 
 1. Select **Review + create**.
 
@@ -206,64 +197,35 @@ In this step you will create a virtual machine, assign a public IP address to it
 
 1. On the Azure home page, select **All resources**.
 
-1. On the list of your resources, select **MyDdosProtectionPlan**.
+1. On the list of your resources, select **MyPublicIPAddress**.
 
 1. Under **Monitoring**, select **Alerts**.
 
-1. Select **New alert rule**.
+1. Select **Create alert rule**.
 
 1. On the **Create alert rule** page, under **Scope**, select **Edit resource**.
 
-1. On the **Select a resource** pane, in the **Filter by resource type** box, scroll down the list and select **Public IP addresses**.
+1. Select **Under DDoS attack or not** for the signal name.
 
-   ![New alert rule change scope to public IP address](../media/new-alert-rule-change-scope-to-public-ip-address-1.png)
-
-1. On the **Resource** list, select **MyPublicIPAddress**, then select **Done**.
-
-1. On the **Create alert rule** page, under **Condition**, select **Add condition**.
-
-1. Select **Under DDoS attack or not**.
-
-   ![Add condition to alert rule - select a signal](../media/add-condition-to-alert-rule-1.png)
-
-1. On the **Operator** box select **Greater than or equal to**.
+1. Under Alert logic find the **Operator** setting and select **Greater than or equal to**.
 
 1. On **Threshold value**, enter **1** (means under attack).
 
-1. Select **Done**.
-
-    ![Add condition to alert rule - configure signal logic](../media/add-condition-to-alert-rule-2.png)
-
-1. Back on the **Create alert rule** page, under the **Alert rule details** section and in **Alert rule name**, enter **MyDdosAlert**.
+1. Navigate to the details tab and select **Alert rule name**, enter **MyDdosAlert**.
 
     ![End point of create new alert rule](../media/new-alert-rule-end.png)
 
 1. Select **Create alert rule**.
 
- 
-
 ## Task 7: Test with simulation partners
 
+1. Review the [Azure DDoS simulation testing policy](https://learn.microsoft.com/en-us/azure/ddos-protection/test-through-simulations#configure-a-ddos-attack-simulation) page. 
 
-1. Review [Azure DDoS simulation testing policy](https://learn.microsoft.com/azure/ddos-protection/test-through-simulations#azure-ddos-simulation-testing-policy)
+1. Notice there are several testing partners. As you have time, review and try any of the simulation partners.
 
-1. Configure a DDoS test attack using an approved testing partner. If using BreakingPoint Cloud to test use the settings in the screenshot below (you may need to select the 100k pps test size with the trial account), but specifying the IP address of your own **MyPublicIPAddress** resource in the **Target IP Address** box (e.g., **51.140.137.219**)
-   ![DDOSAttack](https://user-images.githubusercontent.com/46939028/138599420-58bef33a-2597-4fa2-919f-bf1614037bc3.JPG)
+## Clean up resources
 
-1. On the Azure portal home page, select **All resources**.
-
-1. In the resources list, select your **MyPublicIPAddress** resource, then under **Monitoring**, select **Metrics**. 
-
-1. In the **Metric** box, select **Under DDoS attack or not** from the list.
-
-1. Now you can see the DDoS attack as it happened. Note it may take the full 10 minutes before you see the results.
-
-   ![Metrics showing resource under DDoS attack](../media/metrics-showing-resource-under-attack.png)
-
- 
-## Task 8: Clean up resources
-
->**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.
+   >**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.
 
 1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
 
@@ -273,4 +235,25 @@ In this step you will create a virtual machine, assign a public IP address to it
    Remove-AzResourceGroup -Name 'MyResourceGroup' -Force -AsJob
    ```
 
-    >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+   >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+
+## Extend your learning with Copilot
+
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ What are DDoS attacks? How are DDoS attacks categorized and are there mitigation strategies?
++ Provide a table summarizing the two different Azure DDoS Protection tiers.
++ What Azure resources can be protected by DDoS Protection?
+
+
+## Learn more with self-paced training
+
++ [Design and implement network security](https://learn.microsoft.com/training/modules/design-implement-network-security-monitoring/). In this module, you learn about and deploy Azure DDoS Protection.
+
+  
+## Key takeaways
+
+Congratulations on completing the lab. Here are the main takeaways for this lab. 
++ A DDoS attack is a malicious attempt to overwhelm an application's resources, making the application unavailable to legitimate users. 
++ Azure DDoS Protection defends against DDoS attacks. It's automatically tuned to help protect your specific Azure resources in a virtual network. 
++ Azure DDoS Proectection features include: always on traffic monitoring, adaptive real time tuning, and telemetry and alerting.  
++ Azure DDoS Protection supports two tier types, DDoS IP Protection and DDoS Network Protection.

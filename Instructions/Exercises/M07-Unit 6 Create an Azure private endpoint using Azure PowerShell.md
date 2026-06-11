@@ -1,20 +1,28 @@
 ---
 Exercise:
-    title: 'M07 - Unit 6 Create an Azure private endpoint using Azure PowerShell'
-    module: 'Module 07 - Design and implement private access to Azure Services'
+  title: M07 - Unit 6 Create an Azure private endpoint using Azure PowerShell
+  module: Module 07 - Design and implement private access to Azure Services
+  description: Configure a private endpoint for a web app.
+  duration: 45 minutes
+  level: 500
+  islab: true
+  primarytopics:
+    - Azure
+    - Azure PowerShell
+    - Azure Private Link
 ---
 
-# M07-Unit 6 Create an Azure private endpoint using Azure PowerShell
+# M07-Unit 6 Create an Azure private endpoint using Azure PowerShell (optional)
 
-Get started with Azure Private Link by using a Private Endpoint to connect securely to an Azure web app. There are many ways to create Endpoints including Portal, CLI, PowerShell etc. 
+> **Note**: This lab is optional. The previous lab, *Restrict network access to PaaS resources with virtual network service endpoints*, covers this capability. In the future, this lab will be retired. 
 
-**Note:** An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Create%20an%20Azure%20private%20endpoint%20using%20Azure%20PowerShell)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
+## Exercise scenario
 
-#### Estimated time: 45 minutes
+Get started with Azure Private Link by using a Private Endpoint to connect securely to an Azure web app. There are many ways to create Endpoints including Portal, CLI, PowerShell etc.
 
-You'll create a Private Endpoint for an Azure web app and deploy a virtual machine to test the private connection.
+![Diagram of private endpoint architecture.](../media/6-exercise-create-azure-private-endpoint-using-azure-powershell.png)
 
-Private Endpoints can be created for different kinds of Azure services, such as Azure SQL and Azure Storage.
+## Estimated time: 45 minutes
 
 **Prerequisites**
 
@@ -26,19 +34,22 @@ Private Endpoints can be created for different kinds of Azure services, such as 
 
 1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
 
-1. On the toolbar of the Cloud Shell pane, select the **Upload/Download files** icon, in the drop-down menu, select **Upload** and upload the following files **template.json** and **parameters.json** into the Cloud Shell home directory one by one.
+1. On the toolbar of the Cloud Shell pane, select the **Manage files** icon, in the drop-down menu, select **Upload** and upload the following files **template.json** and **parameters.json** into the Cloud Shell home directory.
+
+    > **Note:** If you are working in your own subscription the [template files](https://github.com/MicrosoftLearning/AZ-700-Designing-and-Implementing-Microsoft-Azure-Networking-Solutions/tree/master/Allfiles/Exercises) are available in the GitHub lab repository.
 
 If you choose to install and use PowerShell locally, this example requires the Azure PowerShell module version 5.4.1 or later. Run ```Get-Module -ListAvailable Az``` to find the installed version. If you need to upgrade, see [Install Azure PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps). If you're running PowerShell locally, you also need to run ```Connect-AzAccount``` to create a connection with Azure.
 
-In this exercise, you will:
+## Job skills
 
-+ Task 1: Create a resource group
-+ Task 2: Create a virtual network and bastion host
-+ Task 3: Create a test virtual machine
-+ Task 4: Create a Private Endpoint
-+ Task 5: Configure the private DNS zone
-+ Task 6: Test connectivity to the Private Endpoint
-+ Task 7: Clean up resources
+In this exercise, you:
+
+- Task 1: Create a resource group
+- Task 2: Create a virtual network and bastion host
+- Task 3: Create a test virtual machine
+- Task 4: Create a Private Endpoint
+- Task 5: Configure the private DNS zone
+- Task 6: Test connectivity to the Private Endpoint
 
 ## Task 1: Create a resource group and deploy the prerequisite web app
 
@@ -49,6 +60,7 @@ Create a resource group with [New-AzResourceGroup](https://docs.microsoft.com/en
 ```PowerShell
 New-AzResourceGroup -Name 'CreatePrivateEndpointQS-rg' -Location 'eastus'
 ```
+
 Deploy the following ARM templates to create the PremiumV2-tier Azure Web App needed for this exercise:
 
    ```powershell
@@ -56,6 +68,7 @@ Deploy the following ARM templates to create the PremiumV2-tier Azure Web App ne
    
    New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile template.json -TemplateParameterFile parameters.json
    ```
+
 If you receive an error (for example while looking into the Deployment status in the Portal) like "Website with given name GEN-UNIQUE already exists." please make sure to go to the Prerequisites mentioned above regarding editing the template.
 
 ## Task 2: Create a virtual network and bastion host
@@ -72,9 +85,8 @@ Create a virtual network and bastion host with:
 
 - New-AzBastion
 
- 
-
 ```PowerShell
+
 ## Create backend subnet config. ##
 
 $subnetConfig = New-AzVirtualNetworkSubnetConfig -Name myBackendSubnet -AddressPrefix 10.0.0.0/24
@@ -134,10 +146,8 @@ $parameters3 = @{
 }
 
 New-AzBastion @parameters3
+
 ```
-
-
-
 
 ## Task 3: Create a test virtual machine
 
@@ -160,6 +170,10 @@ Create the virtual machine with the following commands:
 - Add-AzVMNetworkInterface
 
 ```PowerShell
+## Register Standard Security Type ##
+
+Register-AzProviderFeature -FeatureName UseStandardSecurityType -ProviderNamespace Microsoft.Compute
+
 ## Set credentials for server admin and password. ##
 
 $cred = Get-Credential
@@ -223,9 +237,6 @@ New-AzVM -ResourceGroupName 'CreatePrivateEndpointQS-rg' -Location 'eastus' -VM 
 
 ```
 
-
-
-
 Azure provides an ephemeral IP for Azure Virtual Machines which aren't assigned a public IP address, or are in the backend pool of an internal Basic Azure Load Balancer. The ephemeral IP mechanism provides an outbound IP address that isn't configurable.
 
 The ephemeral IP is disabled when a public IP address is assigned to the virtual machine or the virtual machine is placed in the backend pool of a Standard Load Balancer with or without outbound rules. If a Azure Virtual Network NAT gateway resource is assigned to the subnet of the virtual machine, the ephemeral IP is disabled.
@@ -239,8 +250,6 @@ In this section, you'll create the Private Endpoint and connection using:
 - New-AzPrivateLinkServiceConnection
 
 - New-AzPrivateEndpoint
-
- 
 
 ```PowerShell
 ## Place web app into variable. This assumes that only one web app exists in the resource group. ##
@@ -289,9 +298,6 @@ $parameters2 = @{
 
 New-AzPrivateEndpoint @parameters2 
 ```
-
-
-
 
 ## Task 5: Configure the private DNS zone
 
@@ -367,7 +373,6 @@ $parameters4 = @{
 New-AzPrivateDnsZoneGroup @parameters4 
 ```
 
-
 ## Task 6: Test connectivity to the Private Endpoint
 
 In this section, you'll use the virtual machine you created in the previous step to connect to the web app across the Private Endpoint.
@@ -381,8 +386,6 @@ In this section, you'll use the virtual machine you created in the previous step
 1. Select **myVM**.
 
 1. On the overview page for **myVM**, select **Connect** then **Bastion**.
-
-1. Select the blue **Use Bastion** button.
 
 1. Enter the username and password that you entered during the virtual machine creation.
 
@@ -404,16 +407,15 @@ In this section, you'll use the virtual machine you created in the previous step
   Aliases: mywebapp8675.azurewebsites.net 
   ```  
 
-
 A private IP address of **10.0.0.5** is returned for the web app name. This address is in the subnet of the virtual network you created previously.
 
 1. In the bastion connection to **myVM**, open Internet Explorer.
 1. Enter the url of your web app, **https://&lt;your-webapp-name&gt;.azurewebsites.net**
 1. You'll receive the default web app page if your application hasn't been deployed:
-  ![screen shot of page in Azure indicating an app service is up and running](../media/web-app-default-page.png)
-1. Close the connection to **myVM**. 
+  ![Screenshot of page in Azure indicating an app service is up and running](../media/web-app-default-page.png)
+1. Close the connection to **myVM**.
 
-## Task 7: Clean up resources
+## Clean up resources
 
 When you're done using the Private Endpoint and the VM, use [Remove-AzResourceGroup](https://docs.microsoft.com/en-us/powershell/module/az.resources/remove-azresourcegroup) to remove the resource group and all the resources it has:
 
@@ -421,7 +423,17 @@ When you're done using the Private Endpoint and the VM, use [Remove-AzResourceGr
 Remove-AzResourceGroup -Name CreatePrivateEndpointQS-rg -Force -AsJob
 ```
 
+## Extend your learning with Copilot
 
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ Provide an example of when to use a private endpoint instead of a service endpoint.
++ How can I troubleshoot private endpoint connectivity issues?
 
+## Learn more with self-paced training
 
++ [Design and implement private access to Azure Services](https://learn.microsoft.com/en-us/training/modules/design-implement-private-access-to-azure-services/). In this module, you learn to design and implement private access to Azure Services with Azure Private Link, and virtual network service endpoints.
 
+## Key takeaways
+
++ Azure Private Link enables you to access Azure PaaS Services (for example, Azure Storage and SQL Database) and Azure hosted customer-owned/partner services over a private endpoint in your virtual network.
++ A private endpoint is a network interface that uses a private IP address from your virtual network. This network interface connects you privately and securely to a service that's powered by Azure Private Link. 

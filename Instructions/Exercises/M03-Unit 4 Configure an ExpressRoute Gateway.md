@@ -1,34 +1,34 @@
 ---
 Exercise:
-    title: 'M03 - Unit 4 Configure an ExpressRoute Gateway'
-    module: 'Module 03 - Design and implement Azure ExpressRoute'
+  title: M03 - Unit 4 Configure an ExpressRoute Gateway
+  module: Module 03 - Design and implement Azure ExpressRoute
+  description: Configure an ExpressRoute gateway.
+  duration: 60 minutes
+  level: 300
+  islab: true
+  primarytopics:
+  - Azure
+  - Azure ExpressRoute
 ---
+
 # M03-Unit 4 Configure an ExpressRoute Gateway
 
-## Deploy ExpressRoute gateways
+## Exercise scenario
 
-To connect your Azure virtual network and your on-premises network via ExpressRoute, you must create a virtual network gateway first. A virtual network gateway serves two purposes: to exchange IP routes between the networks and to route network traffic. 
+To connect your Azure virtual network and your on-premises network via ExpressRoute, you must create a virtual network gateway first. A virtual network gateway serves two purposes: to exchange IP routes between the networks and to route network traffic. To send network traffic on a private connection, you use the gateway type 'ExpressRoute'. This is also referred to as an ExpressRoute gateway and is the type of gateway used when configuring ExpressRoute.
 
-**Note:** An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Configure%20an%20ExpressRoute%20gateway)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
 
-#### Estimated time: 60 minutes (includes ~45 minutes deployment waiting time)
+![Diagram of virtual network gateway.](../media/4-exercise-configure-expressroute-gateway.png)
 
-**Gateway types**
 
-When you create a virtual network gateway, you need to specify several settings. One of the required settings, '-GatewayType', specifies whether the gateway is used for ExpressRoute, or VPN traffic. The two gateway types are:
+## Estimated time: 60 minutes (includes ~45 minutes deployment waiting time
 
-- **VPN** - To send encrypted traffic across the public Internet, you use the gateway type 'VPN'. This is also referred to as a VPN gateway. Site-to-Site, Point-to-Site, and VNet-to-VNet connections all use a VPN gateway.
-- **ExpressRoute** - To send network traffic on a private connection, you use the gateway type 'ExpressRoute'. This is also referred to as an ExpressRoute gateway and is the type of gateway used when configuring ExpressRoute.
-
-Each virtual network can have only one virtual network gateway per gateway type. For example, you can have one virtual network gateway that uses -GatewayType VPN, and one that uses -GatewayType ExpressRoute.
-
+## Job skills
 
 In this exercise, you will:
 
-+ Task 1: Create the VNet and gateway subnet
-+ Task 2: Create the virtual network gateway
-
-
+- Task 1: Create the VNet and gateway subnet
+- Task 2: Create the virtual network gateway
 
 ## Task 1: Create the VNet and gateway subnet
 
@@ -42,20 +42,25 @@ In this exercise, you will:
    | -------------------- | -------------------------------- |
    | Virtual Network Name | CoreServicesVNet                 |
    | Resource Group       | ContosoResourceGroup             |
-   | Location             | East US                          |
+   | Region             | East US                          |
 
-1. Select **Next : IP addresses**.
+1. Select **Next: Security**, review your choices but don't make any changes.
 
-1. On the **IP Addresses** tab, in **IPv4 address space**, enter 10.20.0.0/16, and then select **+ Add subnet**. 
+1. Select **Next : Address space**.
 
-1. In the Add subnet pane, use the information in the following table to create the subnet:
+1. On the **Address space** tab, in **IPv4 address space**, enter 10.20.0.0/16.
 
-   | **Setting**                  | **Value**     |
-   | ---------------------------- | ------------- |
-   | Gateway Subnet name          | GatewaySubnet |
-   | Gateway Subnet address space | 10.20.0.0/27  |
+1. Delete the **default** subnet.
 
-1. And then select **Add**. 
+1. Select **+ Add subnet**. Use the information in the following table to create the subnet:
+
+   | **Setting**                  | **Value**               |
+   | ---------------------------- | ----------------------- |
+   | Subnet purpose               | Virtual Network Gateway |
+   | Starting address | `10.20.0.0`          |
+   | Size    | /27 |
+
+1. And then select **Add**.
 
 1. On the Create virtual network page, select **Review + Create**.
 
@@ -63,9 +68,7 @@ In this exercise, you will:
 
 1. Confirm that the VNet passes the validation and then select **Create**.
 
-> [!Note]  
->
-> If you are using a dual stack virtual network and plan to use IPv6-based private peering over ExpressRoute, select Add IP6 address space and input IPv6 address range values.
+   >**Note**: If you are using a dual stack virtual network and plan to use IPv6-based private peering over ExpressRoute, select Add IP6 address space and input IPv6 address range values.
 
 ## Task 2: Create the virtual network gateway
 
@@ -85,11 +88,7 @@ In this exercise, you will:
    | Gateway type              | ExpressRoute               |
    | SKU                       | Standard                   |
    | Virtual network           | CoreServicesVNet           |
-   | **Public IP address**     |                            |
-   | Public IP address         | Create new                 |
-   | Public IP address name    | CoreServicesVnetGateway-IP |
-   | Public IP address SKU     | Basic                      |
-   | Assignment                | Not configurable           |
+   | Subnet                    | GatewaySubnet              |
    
 1. Select **Review + Create**.
 
@@ -97,9 +96,30 @@ In this exercise, you will:
 
 1. When the deployment is complete, select **Go to Resource**.
 
-> [!Note] 
->
-> it can take up to 45 minutes to deploy a Gateway.
+   >**Note**: It can take up to 45 minutes to deploy a Gateway.
 
-Congratulations! You have successfully created a Virtual network, a gateway subnet, and an ExpressRoute Gateway.
+
+## Extend your learning with Copilot
+
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ How is Azure ExpressRoute different from Virtual WAN? Could you use the technolgies together? Provide examples.
++ What should I consider when choosing between an ExpressRoute provider model and ExpressRoute Direct?
++ Create a table that summarizes the Azure ExpressRoute SKU and their features.
+
+## Learn more with self-paced training
+
++ [Introduction to Azure ExpressRoute](https://learn.microsoft.com/training/modules/intro-to-azure-expressroute/). In this module, you learn what Azure ExpressRoute is and the functionality it provides.
++ [Design and implement ExpressRoute](https://learn.microsoft.com/training/modules/design-implement-azure-expressroute/). In this module, you learn how to design and implement Azure ExpressRoute, ExpressRoute Global Reach, ExpressRoute FastPath.
+
+## Key takeaways
+
+Congratulations on completing the lab. Here are the main takeaways for this lab. 
++ Azure ExpressRoute allows an organization to connect their on-premises networks directly into the Microsoft Azure and Microsoft 365 clouds. Azure ExpressRoute uses a dedicated high-bandwidth connection provided by a Microsoft partner.
++ Microsoft guarantees a minimum of 99.95% availability for ExpressRoute dedicated connections. The connection is private and travels over a dedicated line, third parties can't intercept the traffic.
++ You can create a connection between your on-premises network and the Microsoft cloud in four different ways, CloudExchange Co-location, Point-to-point Ethernet Connection, Any-to-any (IPVPN) Connection, and ExpressRoute Direct.
++ ExpressRoute features is determined by the SKU: Local, Standard, and Premuium. 
+
+
+
+
 

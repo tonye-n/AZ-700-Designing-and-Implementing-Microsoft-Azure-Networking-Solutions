@@ -1,26 +1,27 @@
 ---
 Exercise:
-    title: 'M04 - Unit 4 Create and configure an Azure load balancer'
-    module: 'Module 04 - Load balancing non-HTTP(S) traffic in Azure'
+  title: M04 - Unit 4 Create and configure an Azure load balancer
+  module: Module 04 - Load balancing non-HTTP(S) traffic in Azure
+  description: Create and configure an internal load balancer.
+  duration: 60 minutes
+  level: 300
+  islab: true
+  primarytopics:
+    - Azure
+    - Azure Load Balancer
 ---
-
 
 # M04-Unit 4 Create and configure an Azure load balancer
 
-In this exercise, you will create an internal load balancer for the fictional Contoso Ltd organization. 
+In this exercise, you will create an internal load balancer for the fictional Contoso Ltd organization. With an internal load balancer, the front end has a private IP address inside your virtual network. You test connectivity from a host inside the same network.
 
-**Note:** An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Create%20and%20configure%20an%20Azure%20load%20balancer)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
+![internal standard loadbalancer diagram](../media/4-exercise-create-configure-azure-load-balancer.png)
 
-#### Estimated time: 60 minutes (includes ~45 minutes deployment waiting time)
+## Estimated time: 60 minutes (includes ~45 minutes deployment waiting time)
 
-The steps to create an internal load balancer, are very similar to those you have already learned about in this module, to create a public load balancer. The key difference is that with a public load balancer the front end is accessed via a public IP address, and you test connectivity from a host which is located outside your virtual network; whereas, with an internal load balancer, the front end is a private IP address inside your virtual network, and you test connectivity from a host inside the same network.
+## Job skills
 
-The diagram below illustrates the environment you will be deploying in this exercise.
-
-![internal standard loadbalancer diagram](../media/exercise-internal-standard-load-balancer-environment-diagram.png)
-
- 
-In this exercise, you will:
+In this exercise, you:
 
 + Task 1: Create the virtual network
 + Task 2: Create backend servers
@@ -31,14 +32,14 @@ In this exercise, you will:
 ## Task 1: Create the virtual network
 
 In this section, you will create a virtual network and a subnet.
-   
+
 1. Log in to the Azure portal.
 
-2. On the Azure portal home page, navigate to the Global Search bar and search **Virtual Networks** and select virtual networks under services.  ![Azure portal home page Global Search bar results for virtual network.](../media/global-search-bar.PNG)
+1. On the Azure portal home page, navigate to the Global Search bar and search **Virtual Networks** and select virtual networks under services.  ![Azure portal home page Global Search bar results for virtual network.](../media/global-search-bar.PNG)
 
-3. Select **Create** on the Virtual networks page.  ![Create a virtual network wizard.](../media/create-virtual-network.png)
+1. Select **Create** on the Virtual networks page.  
 
-4. On the **Basics** tab, use the information in the table below to create the virtual network.
+1. On the **Basics** tab, use the information in the table below to create the virtual network.
 
    | **Setting**    | **Value**                                  |
    | -------------- | ------------------------------------------ |
@@ -47,52 +48,56 @@ In this section, you will create a virtual network and a subnet.
    | Name           | **IntLB-VNet**                             |
    | Region         | **(US) East US**                           |
 
+1. Select **Next** (takes you to the Security tab).
 
-5. Select **Next : IP Addresses**.
+1. Under **Azure Bastion** select **Enable Azure Bastion**, then enter the information from the table below.
 
-6. On the **IP Addresses** tab, in the **IPv4 address space** box, remove the default and enter **10.1.0.0/16**.
+    | **Setting**                   | **Value**                                                    |
+    | ----------------------------- | ------------------------------------------------------------ |
+    | Host name                     | **myBastionHost**                                            |
+    | Public IP address             | Select **Create a public IP address**  Name: **myBastionIP** |
 
-7. On the **IP Addresses** tab, select **+ Add subnet**.
+1. Select **Next** (takes you to the Address space tab).
 
-8. In the **Add subnet** pane, provide a subnet name of **myBackendSubnet**, and a subnet address range of **10.1.0.0/24**.
+1. On the **Address space** tab, in the **IPv4 address space** box, replace the prepopulated IPv4 address space with: **10.1.0.0/16**.
 
-9. Select **Add**.
+1. On the **Address space** tab, under **Subnets**, delete the **default** subnet.
 
-10. Select **Add subnet**, provide a subnet name of **myFrontEndSubnet**, and a subnet address range of **10.1.2.0/24**. Select **Add**
+1. On the **Address space** tab, select **+ Add a subnet**.
 
-11. Select **Next : Security**.
+1. In the **Add subnet** pane, provide a subnet name of **myBackendSubnet**, and a starting address of: **10.1.0.0/24**.
 
-12. Under **BastionHost** select **Enable**, then enter the information from the table below.
+1. Ensure **Enable private network (no default outbound access)** is **not** checked. **Save** your changes. Select **Add**
 
-    | **Setting**                       | **Value**                                     |
-    | --------------------------------- | --------------------------------------------- |
-    | Bastion name                      | **myBastionHost**                             |
-    | AzureBastionSubnet address  space | **10.1.1.0/24**                               |
-    | Public IP address                 | Select **Create  new**  Name: **myBastionIP** |
+1. Select **+ Add a subnet** again, provide a subnet name of **myFrontEndSubnet**, and a starting address of: **10.1.2.0/24**. Select **Add**
 
+1. Verify that **AzureBastionSubnet** exists, add if needed.
 
-13. Select **Review + create**.
+1. Select **Review + create**.
 
-14. Select **Create**.
+1. Select **Create**.
 
 ## Task 2: Create backend servers
 
 In this section, you will create three VMs, that will be in the same availability set, for the backend pool of the load balancer, add the VMs to the backend pool, and then install IIS on the three VMs to test the load balancer.
 
-1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
+1. In the Azure portal, select the Cloud Shell icon (top right). If necessary, configure the shell.  
+    + Select **PowerShell**.
+    + Select **No Storage Account required** and your **Subscription**, then select **Apply**.
+    + Wait for the terminal to create and a prompt to be displayed. 
 
-2. On the toolbar of the Cloud Shell pane, select the **Upload/Download files** icon, in the drop-down menu, select **Upload** and upload the following files azuredeploy.json, azuredeploy.parameters.vm1.json, azuredeploy.parameters.vm2.json and azuredeploy.parameters.vm3.json into the Cloud Shell home directory one by one.
+2. On the toolbar of the Cloud Shell pane, select the **Manage files** icon, in the drop-down menu, select **Upload/Download** and upload the following files azuredeploy.json, and azuredeploy.parameters.json into the Cloud Shell home directory.
 
-3. Deploy the following ARM templates to create the VMs needed for this exercise:
+    > **Note:** If you are working in your own subscription the [template files](https://github.com/MicrosoftLearning/AZ-700-Designing-and-Implementing-Microsoft-Azure-Networking-Solutions/tree/master/Allfiles/Exercises) are available in the GitHub lab repository.
 
->**Note**: You will be prompted to provide an Admin password.
+4. Deploy the following ARM templates to create the VMs needed for this exercise:
+
+   >**Note**: You will be prompted to provide an Admin password.
 
    ```powershell
    $RGName = "IntLB-RG"
    
-   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.vm1.json
-   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.vm2.json
-   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.vm3.json
+   New-AzResourceGroupDeployment -ResourceGroupName $RGName -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.json
    ```
 
 It may take 5-10 min to create these three VMs. You do not have to wait until this job completes, you can continue with the next task already.
@@ -103,11 +108,9 @@ In this section, you will create an internal Standard SKU load balancer. The rea
 
 1. On the Azure portal home page, select **Create a resource**.
 
-1. On the search box at the top of the page, enter **Load Balancer**, then press **Enter** (**Note:** do not select one from the list).
+1. Search for and select **Load Balancers**.
 
-1. On the results page, locate and select **Load Balancer** (the one that says 'Microsoft' and 'Azure Service' under the name).
-
-1. Select **Create**.
+1. Select **Create** and in the drop-down select **Standard Load balancer**.
 
 1. On the **Basics** tab, use the information in the table below to create the load balancer.
 
@@ -116,22 +119,21 @@ In this section, you will create an internal Standard SKU load balancer. The rea
    | Subscription          | Select your subscription |
    | Resource group        | **IntLB-RG**             |
    | Name                  | **myIntLoadBalancer**    |
-   | Region                | **(US) East US**         |
-   | Type                  | **Internal**             |
+   | Region                | **East US**         |
    | SKU                   | **Standard**             |
-
+   | Type                  | **Internal**             |
+   | Tier                  | **Regional**             |
 
 1. Select **Next: Frontend IP configurations**.
-1. Select Add a frontend IP
-1. On the **Add frontend IP address** blade, enter the information from the table below and select **Add**.
- 
+   
+1. Select **Add frontend IP configuration**. Enter the information from the table below and select **Save**.
+
    | **Setting**     | **Value**                |
    | --------------- | ------------------------ |
    | Name            | **LoadBalancerFrontEnd** |
    | Virtual network | **IntLB-VNet**           |
    | Subnet          | **myFrontEndSubnet**     |
    | Assignment      | **Dynamic**              |
-
 
 1. Select **Review + create**.
 
@@ -155,15 +157,14 @@ The backend address pool contains the IP addresses of the virtual NICs connected
    | --------------- | -------------------- |
    | Name            | **myBackendPool**    |
    | Virtual network | **IntLB-VNet**       |
+   | Backend pool configuration | **NIC**  |
 
-
-1. Under **Virtual machines**, select **Add**.
+1. Click **Add** for the IP Configurations. 
 
 1. Select the checkboxes for all 3 VMs (**myVM1**, **myVM2**, and **myVM3**), then select **Add**.
 
-1. Select **Add**.
+1. Select **Save**. Double-check that you have a backend pool with three virtual machines. 
    ![Picture 7](../media/add-vms-backendpool.png)
-   
 
 ### Create a health probe
 
@@ -180,19 +181,14 @@ The load balancer monitors the status of your app with a health probe. The healt
    | Port                | **80**            |
    | Path                | **/**             |
    | Interval            | **15**            |
-   | Unhealthy threshold | **2**             |
-
 
 1. Select **Add**.
-   ![Picture 5](../media/create-healthprobe.png)
-
- 
 
 ### Create a load balancer rule
 
 A load balancer rule is used to define how traffic is distributed to the VMs. You define the frontend IP configuration for the incoming traffic and the backend IP pool to receive the traffic. The source and destination port are defined in the rule. Here you will create a load balancer rule.
 
-1. From the **Backend pools** page of your load balancer, under **Settings**, select **Load balancing rules**, then select **Add**.
+1. Under **Settings**, select **Load balancing rules**, then select **Add**.
 
 1. On the **Add load balancing rule** page, enter the information from the table below.
 
@@ -201,25 +197,17 @@ A load balancer rule is used to define how traffic is distributed to the VMs. Yo
    | Name                   | **myHTTPRule**           |
    | IP Version             | **IPv4**                 |
    | Frontend IP address    | **LoadBalancerFrontEnd** |
+   | Backend pool           | **myBackendPool**        |
    | Protocol               | **TCP**                  |
    | Port                   | **80**                   |
    | Backend port           | **80**                   |
-   | Backend pool           | **myBackendPool**        |
    | Health probe           | **myHealthProbe**        |
    | Session persistence    | **None**                 |
    | Idle timeout (minutes) | **15**                   |
-   | Floating IP            | **Disabled**             |
+   | Enable TCP Reset       | **Not checked**          |
+   | Enable Floating IP     | **Not checked**          |
 
-
-1. Select **Add**.
-   ![Picture 6](../media/create-loadbalancerrule.png)
-
- 
-
-
- 
-
- 
+1. Select **Save**.
 
 ## Task 5: Test the load balancer
 
@@ -231,6 +219,8 @@ In this section, you will create a test VM, and then test the load balancer.
 
 1. On the **Create a virtual machine** page, on the **Basics** tab, use the information in the table below to create the first VM.
 
+    > **Note:** If the Image isn't available, select another image. The specifics don't matter, we are just creating a VM for testing. 
+
    | **Setting**          | **Value**                                    |
    | -------------------- | -------------------------------------------- |
    | Subscription         | Select your subscription                     |
@@ -238,14 +228,13 @@ In this section, you will create a test VM, and then test the load balancer.
    | Virtual machine name | **myTestVM**                                 |
    | Region               | **(US) East US**                             |
    | Availability options | **No infrastructure redundancy required**    |
-   | Image                | **Windows Server 2019 Datacenter - Gen 2**   |
+   | Image                | **Windows Server 2025 Datacenter Server Core - x64 Gen 2**   |
    | Size                 | **Standard_DS2_v3 - 2 vcpu, 8 GiB memory**   |
    | Username             | **TestUser**                                 |
    | Password             | **Provide a secure password**                |
    | Confirm password     | **Provide a secure password**                |
 
-
-1. Select **Next : Disks**, then select **Next : Networking**. 
+1. Select **Next : Disks**, then select **Next : Networking**.
 
 1. On the **Networking** tab, use the information in the table below to configure networking settings.
 
@@ -257,7 +246,6 @@ In this section, you will create a test VM, and then test the load balancer.
    | NIC network security group                                   | **Advanced**                  |
    | Configure network security group                             | Select the existing **myNSG** |
    | Load balancing options                                       | **None**                      |
-
 
 1. Select **Review + create**.
 
@@ -287,7 +275,7 @@ In this section, you will create a test VM, and then test the load balancer.
 
 1. Select **OK** on the **Set up Internet Explorer 11** dialog box.
 
-1. Enter (or paste) the **Private IP address** (e.g. 10.1.0.4) from the previous step into the address bar of the browser and press Enter.
+1. Enter (or paste) the **Private IP address** from the previous step into the address bar of the browser and press Enter.
 
 1. The default web home page of the IIS Web server is displayed in the browser window. One of the three virtual machines in the backend pool will respond.
     ![Picture 8](../media/load-balancer-web-test-1.png)
@@ -307,4 +295,25 @@ In this section, you will create a test VM, and then test the load balancer.
    Remove-AzResourceGroup -Name 'IntLB-RG' -Force -AsJob
    ```
 
-    >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+   >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+
+## Extend your learning with Copilot
+
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ How are the Azure public and private load balancers different? Provide example scenarios for each type.
++ Provide a table that compares the Azure load balancer basic and standard SKUs.
++ How does the Azure load balancer decide to process incoming requests?
+
+
+## Learn more with self-paced training
++ [Introduction to Azure Load Balancer](https://learn.microsoft.com/training/modules/intro-to-azure-load-balancer/). This module explains what Azure Load Balancer does, how it works, and when you should choose to use Load Balancer as a solution to meet your organization's needs.
+
+
+## Key takeaways
+
+Congratulations on completing the lab. Here are the main takeaways for this lab. 
++ Load balancing refers to efficiently distributing incoming network traffic across a group of backend servers or resources.
++ Azure Load Balancer distributes inbound flows from the load balancer's frontend to backend pool instances. These flows are distributed according to configured load-balancing rules and health probes. The backend pool instances can be Azure virtual machines (VMs) or virtual machine scale sets.
++ Azure offers both public and private load balancers. Public Load Balancers are ideal for internet-facing applications, outbound connections, and web applications. Private load balancers are better for internal applications, backend services, and hybrid scenarios.
+
+

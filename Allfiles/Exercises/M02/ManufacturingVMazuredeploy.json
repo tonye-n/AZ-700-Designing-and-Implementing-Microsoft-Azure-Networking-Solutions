@@ -43,7 +43,7 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "computeApiVersion": "2018-06-01",
     "networkApiVersion": "2018-08-01",
-    "location": "West Europe"
+    "location": "westeurope"
   },
     "resources": [
         {
@@ -152,14 +152,15 @@
   "name":  "[variables('PIPName1')]",
   "location": "[variables('location')]",
   "sku": {
-    "name": "Basic",
+    "name": "Standard",
     "tier": "Regional"
   },
   "properties": {
     "publicIPAddressVersion": "IPv4",
-    "publicIPAllocationMethod": "Dynamic"
+    "publicIPAllocationMethod": "Static"
   }
 }
     ],
     "outputs": {}
 }
+

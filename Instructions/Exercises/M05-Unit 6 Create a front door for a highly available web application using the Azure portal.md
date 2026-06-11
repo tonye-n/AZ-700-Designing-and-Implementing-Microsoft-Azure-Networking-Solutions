@@ -1,30 +1,36 @@
 ---
 Exercise:
-    title: 'M05 - Unit 6 Create a Front Door for a highly available web application using the Azure portal'
-    module: 'Module 05 - Load balancing HTTP(S) traffic in Azure'
+  title: M05 - Unit 6 Create a Front Door for a highly available web application using the Azure portal
+  module: Module 05 - Load balancing HTTP(S) traffic in Azure
+  description: Create and configure Azure Front Door.
+  duration: 30 minutes
+  level: 400
+  islab: true
+  primarytopics:
+    - Azure
+    - Azure Front Door
 ---
-
-
 
 # M05-Unit 6 Create a Front Door for a highly available web application using the Azure portal
 
- 
+## Exercise scenario  
 
 In this exercise, you will set up an Azure Front Door configuration that pools two instances of a web application that runs in different Azure regions. This configuration directs traffic to the nearest site that runs the application. Azure Front Door continuously monitors the web application. You will demonstrate automatic failover to the next available site when the nearest site is unavailable. The network configuration is shown in the following diagram:
 
-![Network configuration for Azure Front Door.](../media/front-door-environment-diagram.png)
+![Network configuration for Azure Front Door.](../media/6-exercise-create-front-door-for-highly-available.png)
 
-In this exercise, you will:
+
+## Estimated time: 30 minutes
+
+## Job skills
+
+In this exercise, you:
 
 + Task 1: Create two instances of a web app
 + Task 2: Create a Front Door for your application
 + Task 3: View Azure Front Door in action
-+ Task 4: Clean up resources
-
-**Note:** An **[interactive lab simulation](https://mslabs.cloudguides.com/guides/AZ-700%20Lab%20Simulation%20-%20Create%20a%20Front%20Door%20profile%20for%20a%20highly%20available%20web%20application)** is available that allows you to click through this lab at your own pace. You may find slight differences between the interactive simulation and the hosted lab, but the core concepts and ideas being demonstrated are the same.
 
 
-#### Estimated time: 30 minutes
 
 ## Task 1: Create two instances of a web app
 
@@ -44,13 +50,13 @@ This exercise requires two instances of a web application that run in different 
    | Resource group   | Select the resource group ContosoResourceGroup               |
    | Name             | Enter a unique Name for your web app. This example uses WebAppContoso-1. |
    | Publish          | Select **Code**.                                             |
-   | Runtime stack    | Select **.NET 6 (LTS)**.                                     |
+   | Runtime stack    | Select **.NET 8 (LTS)**.                                     |
    | Operating System | Select **Windows**.                                          |
    | Region           | Select **Central US**.                                       |
    | Windows Plan     | Select **Create new** and enter myAppServicePlanCentralUS in the text box. |
-   | Princing Plan    | Select **Standard S1 100 total ACU, 1.75 GB memory**.        |
+   | Pricing Plan    | Select **Standard S1 100 total ACU, 1.75 GB memory**.        |
 
-1. Select **Review + create**, review the Summary, and then select **Create**.   
+1. Select **Review + create**, review the Summary, and then select **Create**.
    ‎It might take several minutes for the deployment to complete.
 
 1. Create a second web app. On the Azure Portal home page, search  **WebApp**.
@@ -65,14 +71,16 @@ This exercise requires two instances of a web application that run in different 
    | Resource group   | Select the resource group ContosoResourceGroup               |
    | Name             | Enter a unique Name for your web app. This example uses WebAppContoso-2. |
    | Publish          | Select **Code**.                                             |
-   | Runtime stack    | Select **.NET 6 (LTS)**.                                     |
+   | Runtime stack    | Select **.NET 8 (LTS)**.                                     |
    | Operating System | Select **Windows**.                                          |
    | Region           | Select **East US**.                                          |
    | Windows Plan     | Select **Create new** and enter myAppServicePlanEastUS in the text box. |
    | Pricing Plan     | Select **Standard S1 100 total ACU, 1.75 GB memory**.        |
 
-1. Select **Review + create**, review the Summary, and then select **Create**.   
+1. Select **Review + create**, review the Summary, and then select **Create**.
    ‎It might take several minutes for the deployment to complete.
+
+   >**Note**: If you receive a deployment error, read the notification carefully. If the error involves the region availability due to quotas, try changing to another region. 
 
 ## Task 2: Create a Front Door for your application
 
@@ -84,7 +92,6 @@ Configure Azure Front Door to direct user traffic based on lowest latency betwee
 
 1. On the Basics tab, enter or select the following information.
 
-
    | **Setting**             | **Value**                                    |
    | ----------------------- | -------------------------------------------- |
    | Subscription            | Select your subscription.                    |
@@ -93,28 +100,33 @@ Configure Azure Front Door to direct user traffic based on lowest latency betwee
    | Name                    | Enter a unique name in this subscription like FrontDoor(yourinitials)   |
    | Tier                    | Standard   |
    | Endpoint Name           | FDendpoint   |
-   | Origin Type             | App Service| 
+   | Origin Type             | App Service|
    | Origin host name        | The name of the web app you previously deployed |
-   
 
 1. Select **Review and Create**, and then select **Create**.
 
 1. Wait for the resource to deploy, and then select **Go to resource**.
+
 1. On the Front Door resource in the Overview blade, locate the **Origin Groups**, select the origin group created
-1. To update the origin group select the name **default-origin-group** from the list. Select **Add an origin** and add the second Web App. Select Add and then select Update. 
+
+1. To update the origin group select the name **default-origin-group** from the list. Select **Add an origin** and add the second Web App. Select Add and then select Update.
 
 ## Task 3: View Azure Front Door in action
 
-Once you create a Front Door, it takes a few minutes for the configuration to be deployed globally. Once complete, access the frontend host you created. 
+Once you create a Front Door, it takes a few minutes for the configuration to be deployed globally. Once complete, access the frontend host you created.
 
 1. On the Front Door resource in the Overview blade, locate the endpoint hostname that is created for your endpoint. This should be fdendpoint followed by a hyphen and a random string. For example, **fdendpoint-fxa8c8hddhhgcrb9.z01.azurefd.net**. **Copy** this FQDN.
 
-1. In a new browser tab, navigate to the Front Door endpoint FQDN. The default App Service page will be displayed.
-   ![Browser showing App Service information page](../media/app-service-info-page.png)
+1. In a new browser tab, navigate to the Front Door endpoint FQDN. An information page that states the web app is up and running and waiting for content will be displayed.
+
+    ![Screenshot showing web app is waiting for content.](../media/front-door-app-ready.png)
+
+1. It can take up to an hour before the default App Service page is displayed.
+   ![Screenshot showing the App Service information page.](../media/app-service-info-page.png)
 
 1. To test instant global failover in action, try the following steps:
 
-1. Switch to the Azure portal, search for and select **App services**. 
+1. Switch to the Azure portal, search for and select **App services**.
 
 1. Select one of your web apps, then select **Stop**, and then select **Yes** to verify.
 
@@ -122,7 +134,7 @@ Once you create a Front Door, it takes a few minutes for the configuration to be
 
 1. Switch back to your browser and select Refresh. You should see the same information page.
 
-**There may be a delay while the web app stops. If you get an error page in your browser, refresh the page**.
+    **There may be a delay while the web app stops. If you get an error page in your browser, refresh the page**.
 
 1. Switch back to the Azure Portal, locate the other web app, and stop it.
 
@@ -131,10 +143,9 @@ Once you create a Front Door, it takes a few minutes for the configuration to be
    ![Browser showing App Service error page](../media/web-apps-both-stopped.png)
 
    Congratulations! You have configured and tested an Azure Front Door.
-   
 
-## Task 4: Clean up resources
-   
+## Clean up resources
+
    >**Note**: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.
 
 1. On the Azure portal, open the **PowerShell** session within the **Cloud Shell** pane.
@@ -147,4 +158,23 @@ Once you create a Front Door, it takes a few minutes for the configuration to be
 
    ```
 
-    >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+   >**Note**: The command executes asynchronously (as determined by the -AsJob parameter), so while you will be able to run another PowerShell command immediately afterwards within the same PowerShell session, it will take a few minutes before the resource groups are actually removed.
+
+## Extend your learning with Copilot
+
+Copilot can assist you in learning how to use the Azure scripting tools. Copilot can also assist in areas not covered in the lab or where you need more information. Open an Edge browser and choose Copilot (top right) or navigate to *copilot.microsoft.com*. Take a few minutes to try these prompts.
++ What are the differences between Azure Application Gateway and Azure Front Door? Provide examples where I would use each product.
++ Provide a checklist of things to do when configuring Azure Front Door.
++ What is an origin in Azure Front Door and how is it different from an endpoint?
+
+
+## Learn more with self-paced training
+
++ [Load balance HTTP(S) traffic in Azure](https://learn.microsoft.com/training/modules/load-balancing-https-traffic-azure/). Learn how to design load balancer solutions for HTTP(S) traffic and how to implement Azure Application Gateway and Azure Front Door.
+
+## Key takeaways
+
+Congratulations on completing the lab. Here are the main takeaways for this lab. 
++ Azure Front Door is a cloud-based service that delivers your applications anywhere across the globe. 
++ Azure Front Door uses layer 7 load balancing to distribute traffic across multiple regions and endpoints.
++ Azure Front Door supports different traffic routing methods to determine how your HTTP/HTTPS traffic is distributed. The routing methods are: latency, priority, weighted, and session affinity. 
